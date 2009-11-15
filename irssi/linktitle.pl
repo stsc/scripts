@@ -11,7 +11,7 @@ use LWP::UserAgent;
 sub fetch_url_title
 {
     my ($server, $data, $nick, $addr, $target) = @_;
-    return unless $data =~ /\bhttp:/;
+    return unless $data =~ m{\bhttp://};
 
     my @ignores = (
        qr{^GitHub\d+$},
@@ -29,7 +29,7 @@ sub fetch_url_title
     };
     $scrub_whitespace->(\$data);
 
-    my @urls = grep /^http:/, split /\s+/, $data;
+    my @urls = grep m{^http://}, split /\s+/, $data;
 
     my @exclusions = (
        qr{^http://(?:www\.)?perlpunks\.de},
@@ -51,13 +51,14 @@ sub fetch_url_title
             my $content = $response->content;
             my ($title) = $content =~ m{<title.*?>(.*?)</title>}is;
             if (defined $title && $title =~ /\S/) {
-                $scrub_whitespace->(\$title);
                 $title =~ s/[\r\n]/ /g;
+                $scrub_whitespace->(\$title);
+                $title =~ s/\s{2,}/ /g;
                 decode_entities($title);
                 $server->command("msg $target [ $title ]");
                 Irssi::print("url title for $target");
             }
-            elsif ($content =~ m{<title.*?>\s*</title>}) {
+            elsif ($content =~ m{<title.*?>\s*</title>}is) {
                 $server->command("msg $target [ Untitled document ]");
                 Irssi::print("empty url title for $target");
             }
