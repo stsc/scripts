@@ -3,15 +3,17 @@
 use strict;
 use warnings;
 
+use Encode;
 use Irssi;
 use HTML::Entities;
 use HTTP::Size;
+use IO::Socket::SSL;
 use LWP::UserAgent;
 
 sub fetch_url_title
 {
     my ($server, $data, $nick, $addr, $target) = @_;
-    return unless $data =~ m{\bhttp://};
+    return unless $data =~ m{\bhttps?://\S+};
 
     my @ignores = (
        qr{^GitHub\d+$},
@@ -29,7 +31,7 @@ sub fetch_url_title
     };
     $scrub_whitespace->(\$data);
 
-    my @urls = grep m{^http://}, split /\s+/, $data;
+    my @urls = grep m{^https?://\S+}, split /\s+/, $data;
 
     my @exclusions = (
        qr{^http://(?:www\.)?perlpunks\.de},
@@ -44,13 +46,28 @@ sub fetch_url_title
     }
 
     foreach my $url (@urls) {
-        next unless my $size = HTTP::Size::get_size($url);
-        next if int($size / 1024) > 512;
-        my $response = LWP::UserAgent->new->get($url);
+        my %options;
+        my $size = HTTP::Size::get_size($url);
+        if (defined $size) {
+            if (int($size / 1024) > 1024) {
+                next;
+            }
+            %options = ();
+        }
+        else {
+            %options = (max_size => 1024 * 1024);
+        }
+        my $ua = LWP::UserAgent->new(%options);
+        $ua->ssl_opts(SSL_verify_mode => SSL_VERIFY_NONE);
+        my $response = $ua->get($url);
+        if (exists $options{max_size} && $response->header('Client-Aborted')) {
+            next;
+        }
         if ($response->is_success && $response->headers->content_is_text) {
             my $content = $response->content;
-            my ($title) = $content =~ m{<title.*?>(.*?)</title>}is;
+            my ($title) = $content =~ m{<title(?:\s+.*?)?>(.+?)</title>}is;
             if (defined $title && $title =~ /\S/) {
+                $title = Encode::decode('UTF-8', $title);
                 $title =~ s/[\r\n]/ /g;
                 $scrub_whitespace->(\$title);
                 $title =~ s/\s{2,}/ /g;
@@ -58,7 +75,7 @@ sub fetch_url_title
                 $server->command("msg $target [ $title ]");
                 Irssi::print("url title for $target");
             }
-            elsif ($content =~ m{<title.*?>\s*</title>}is) {
+            elsif ($content =~ m{<title(?:\s+.*?)?>\s*</title>}is) {
                 $server->command("msg $target [ Untitled document ]");
                 Irssi::print("empty url title for $target");
             }
