@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+# Requires LWP::Protocol::https implicitly to be installed
 
 use strict;
 use warnings;
