@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright (c) 2012-2013 Steven Schubiger
+# Copyright (c) 2012-2013, 2015 Steven Schubiger
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,17 +27,17 @@ use IPC::Open3 qw(open3);
 use Irssi;
 use Symbol qw(gensym);
 
-my $VERSION = '0.04';
+my $VERSION = '0.05';
 
 #-----------------------
 # Start of configuration
 #-----------------------
 
-my $perl      = '/home/sts/perl-5.18.0/bin/perl';
+my $perl      = '/home/sts/perl/perl-5.20.2/bin/perl';
 my $jail      = 'jail';
 my $user_name = 'p5eval';
 my $timeout   = 5;
-my $source    = 'http://refcnt.org/~sts/code/p5eval.pl';
+my $source    = 'http://stsc.refcnt.org/code/p5eval.pl';
 
 #---------------------
 # End of configuration
@@ -50,8 +50,16 @@ sub process_perl_code
 
     my $user = $1;
 
-    if ($user eq 'source') {
+    if ($user =~ /^(?:\?|help)$/i) {
+        $server->command("msg $target $nick: Usage p5eval: <perl5 code>");
+        return;
+    }
+    elsif ($user =~ /^source$/i) {
         $server->command("msg $target $nick: $source");
+        return;
+    }
+    elsif ($user =~ /^version$/i) {
+        $server->command("msg $target $nick: v$VERSION");
         return;
     }
 
