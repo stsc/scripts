@@ -20,15 +20,16 @@ sub quote
     my @persons = sort grep !/^\.\.?$/, readdir($dh);
     closedir($dh);
 
-    if ($data =~ /^[?!]quote$/) {
+    if ($data =~ /^[?!]quote\s*$/) {
         my $persons = join ', ', @persons;
-        $server->command("msg $target !quote random or $persons");
+        $server->command("msg $target !quote random or $persons [/keyword/]");
     }
-    elsif ($data =~ /^!quote \s+ (\w+)/x) {
-        my $person = $1;
+    elsif ($data =~ /^!quote \s+ (\w+) (?:\s+ \/(.+?)\/)? \s* $/x) {
+        my $person  = $1;
+        my $keyword = $2;
 
         my %persons = map { $_ => true } ('random', @persons);
-        return unless $persons{$person};
+        return if !$persons{$person} || ($person eq 'random' && defined $keyword);
 
         my $random = ($person eq 'random') ? $persons[int rand scalar @persons] : undef;
         my $file = File::Spec->catfile($quote_dir, defined $random ? $random : $person);
@@ -37,12 +38,16 @@ sub quote
         my @quotes = <$fh>;
         close($fh);
 
-        chomp(my $quote = $quotes[int rand scalar @quotes]);
+        my @list = defined $keyword ? grep /\Q$keyword\E/i, @quotes : @quotes;
+        my $quote = @list ? $list[int rand scalar @list] : 'empty';
 
-        my $string = defined $random
-          ? "msg $target $quote ($random)"
-          : "msg $target $quote";
-        $server->command($string);
+        if (defined $quote) {
+            chomp $quote;
+            my $string = defined $random
+              ? "msg $target $quote ($random)"
+              : "msg $target $quote";
+            $server->command($string);
+        }
     }
 }
 
