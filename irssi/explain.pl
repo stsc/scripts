@@ -6,14 +6,14 @@ use warnings;
 use File::HomeDir;
 use File::Spec;
 use Irssi;
-use Storable;
+use Storable qw(lock_nstore lock_retrieve);
 
 my $bot_name = 'AL-76';
 
 my $file = File::Spec->catfile(File::HomeDir->my_home, '.irssi', 'scripts', 'data', 'explain.dat');
 
-store({}, $file) unless -e $file;
-my $explain = retrieve($file);
+lock_nstore({}, $file) unless -e $file;
+my $explain = lock_retrieve($file);
 
 sub explain
 {
@@ -28,14 +28,14 @@ sub explain
     elsif ($data =~ /\G (.+?) \s+ is \s+ (.+?) \s* $/cgx) {
         my ($abbrev, $explanation) = ($1, $2);
         push @{$explain->{$abbrev}}, $explanation;
-        store($explain, $file);
+        lock_nstore($explain, $file);
         $server->command("msg $target $nick: saved $abbrev");
     }
     elsif ($data =~ /\G forget \s+ (.+?) \s* $/cgx) {
         my $abbrev = $1;
         if (exists $explain->{$abbrev}) {
             delete $explain->{$abbrev};
-            store($explain, $file);
+            lock_nstore($explain, $file);
             $server->command("msg $target $nick: forgot $abbrev");
         }
         else {
