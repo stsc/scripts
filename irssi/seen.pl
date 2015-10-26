@@ -7,12 +7,12 @@ use File::HomeDir;
 use File::Spec;
 use Irssi;
 use POSIX qw(strftime);
-use Storable;
+use Storable qw(lock_nstore lock_retrieve);
 
 my $file = File::Spec->catfile(File::HomeDir->my_home, '.irssi', 'scripts', 'data', 'seen.dat');
 
-store({}, $file) unless -e $file;
-my $seen = retrieve($file);
+lock_nstore({}, $file) unless -e $file;
+my $seen = lock_retrieve($file);
 
 sub seen
 {
@@ -45,7 +45,7 @@ sub seen
                 time => time(),
                 text => $text,
             };
-            store($seen, $file);
+            lock_nstore($seen, $file);
         }
     }
 }
