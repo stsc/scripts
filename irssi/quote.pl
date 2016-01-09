@@ -22,7 +22,24 @@ sub quote
 
     if ($data =~ /^[?!]quote\s*$/) {
         my $persons = join ', ', @persons;
-        $server->command("msg $target !quote random or $persons [/keyword/]");
+        $server->command("msg $target !quote random or $persons [/keyword/] | ?quote <person>");
+    }
+    elsif ($data =~ /^\?quote \s+ (\w+) \s* $/x) {
+        my $person = $1;
+
+        my %persons = map { $_ => true } @persons;
+        return unless $persons{$person};
+
+        my $file = File::Spec->catfile($quote_dir, $person);
+        my $quotes = 0;
+
+        open(my $fh, '<', $file) or die "Cannot read $file: $!\n";
+        $quotes++ while <$fh>;
+        close($fh);
+
+        my $suffix = ($quotes == 0 || $quotes > 1) ? 's' : '';
+
+        $server->command("msg $target $person: $quotes quote$suffix");
     }
     elsif ($data =~ /^!quote \s+ (\w+) (?:\s+ \/(.+?)\/)? \s* $/x) {
         my $person  = $1;
