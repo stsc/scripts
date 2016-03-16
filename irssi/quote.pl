@@ -22,24 +22,33 @@ sub quote
 
     if ($data =~ /^[?!]quote\s*$/) {
         my $persons = join ', ', @persons;
-        $server->command("msg $target !quote random or $persons [/keyword/] | ?quote <person>");
+        $server->command("msg $target !quote random or $persons [/keyword/] | ?quote <person> (mtime|total)");
     }
-    elsif ($data =~ /^\?quote \s+ (\w+) \s* $/x) {
+    elsif ($data =~ /^\?quote \s+ (\w+) \s+ (mtime|total) \s* $/x) {
         my $person = $1;
+        my $mode   = $2;
 
         my %persons = map { $_ => true } @persons;
         return unless $persons{$person};
 
         my $file = File::Spec->catfile($quote_dir, $person);
-        my $quotes = 0;
 
-        open(my $fh, '<', $file) or die "Cannot read $file: $!\n";
-        $quotes++ while <$fh>;
-        close($fh);
+        my %modes = (
+            mtime => sub { scalar localtime((stat($file))[9]) },
+            total => sub
+            {
+                my $quotes = 0;
 
-        my $suffix = ($quotes == 0 || $quotes > 1) ? 's' : '';
+                open(my $fh, '<', $file) or die "Cannot read $file: $!\n";
+                $quotes++ while <$fh>;
+                close($fh);
 
-        $server->command("msg $target $person: $quotes quote$suffix");
+                my $suffix = ($quotes == 0 || $quotes > 1) ? 's' : '';
+
+                return "$quotes quote$suffix";
+            },
+        );
+        $server->command("msg $target $person: " . $modes{$mode}->());
     }
     elsif ($data =~ /^!quote \s+ (\w+) (?:\s+ \/(.+?)\/)? \s* $/x) {
         my $person  = $1;
