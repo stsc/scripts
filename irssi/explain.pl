@@ -18,7 +18,6 @@ my $explain = lock_retrieve($file);
 sub explain
 {
     my ($server, $data, $nick, $addr, $target) = @_;
-
     return unless $data =~ /^\Q$bot_name\E(?:\s*[,:])?\s+/g;
 
     if ($data =~ /\G list \s* $/cgx) {
