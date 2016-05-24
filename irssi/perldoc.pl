@@ -6,16 +6,16 @@ use warnings;
 use Irssi;
 use LWP::Simple;
 
-sub fetch_perldoc_url
+my $base_url = 'http://perldoc.perl.org';
+
+sub fetch_perldoc
 {
     my ($server, $data, $nick, $addr, $target) = @_;
 
-    my $base = 'http://perldoc.perl.org';
-
-    if ($data eq '!perldoc') {
-        $server->command("msg $target $base");
+    if ($data =~ /^!perldoc\s*$/) {
+        $server->command("msg $target $base_url");
     }
-    elsif (my @args = $data =~ /^(?:(\S+?) \s+?)? !perldoc \s+? (\S+)/x) {
+    elsif (my @args = $data =~ /^ (?:(\S+) \s+)? !perldoc \s+ (\S+) \s* $/x) {
         my $item = pop @args;
         my $name = do {
             local $_ = shift @args;
@@ -25,8 +25,8 @@ sub fetch_perldoc_url
         (my $path = "$item.html") =~ s{::}{/}g;
 
         my @urls = (
-            ${\join '/', ($base, $path)},
-            ${\join '/', ($base, 'functions', $path)},
+            ${\join '/', ($base_url, $path)},
+            ${\join '/', ($base_url, 'functions', $path)},
         );
         my $link;
         foreach my $url (@urls) {
@@ -45,4 +45,4 @@ sub fetch_perldoc_url
     }
 }
 
-Irssi::signal_add('message public', 'fetch_perldoc_url');
+Irssi::signal_add('message public', 'fetch_perldoc');
