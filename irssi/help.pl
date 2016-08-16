@@ -6,13 +6,14 @@ use warnings;
 use Irssi;
 
 my $bot_name = 'AL-76';
+my $source = 'https://github.com/stsc/scripts/tree/master/irssi';
 
 sub help
 {
     my ($server, $data, $nick, $addr, $target) = @_;
     return unless $data =~ /^\Q$bot_name\E(?:\s*[,:])?\s+/g;
 
-    if ($data =~ /\G (?:\?+|help) \s* $/gix) {
+    if ($data =~ /\G (?:\?+|help) \s* $/cgix) {
         my $commands = join ', ', split /\n/, <<'EOT';
 <abbrev> is <explanation>
 forget <abbrev>
@@ -26,6 +27,9 @@ list
 !seen <nickname>
 EOT
         $server->command("msg $target Usage: $commands");
+    }
+    elsif ($data =~ /\G source \s* $/cgix) {
+        $server->command("msg $target $source");
     }
 }
 
