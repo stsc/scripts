@@ -43,8 +43,8 @@ sub explain
     }
     elsif ($data =~ /\G (.+?)\?* \s* $/cgx) {
         my $abbrev = $1;
-        # there's a separate help command hence skip
-        return if $abbrev =~ /^(?:\?|help)$/i;
+        # there are separate commands hence skip
+        return if $abbrev =~ /^(?:\?|help|source)$/i;
         if (exists $explain->{$abbrev}) {
             my $list = join ' or ', @{$explain->{$abbrev}};
             $server->command("msg $target $abbrev is also known as $list");
