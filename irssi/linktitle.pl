@@ -11,15 +11,20 @@ use HTTP::Size;
 use IO::Socket::SSL;
 use LWP::UserAgent;
 
+my @ignores = (
+    qr{^GitHub\d+$},
+    qr{^uribot$},
+);
+my @exclusions = (
+    qr{^http://(?:www\.)?perlpunks\.de},
+    qr{^http://(?:board|wiki|www)\.perl-community\.de},
+);
+
 sub fetch_url_title
 {
     my ($server, $data, $nick, $addr, $target) = @_;
     return unless $data =~ m{\bhttps?://\S+};
 
-    my @ignores = (
-       qr{^GitHub\d+$},
-       qr{^uribot$},
-    );
     foreach my $ignore (@ignores) {
         return if $nick =~ $ignore;
     }
@@ -34,10 +39,6 @@ sub fetch_url_title
 
     my @urls = grep m{^https?://\S+}, split /\s+/, $data;
 
-    my @exclusions = (
-       qr{^http://(?:www\.)?perlpunks\.de},
-       qr{^http://(?:board|wiki|www)\.perl-community\.de},
-    );
     foreach my $exclude (@exclusions) {
         for (my $i = 0; $i < @urls; $i++) {
             if ($urls[$i] =~ $exclude) {
