@@ -52,7 +52,7 @@ sub fetch_jobs
 #-----------------------#
 # START of web scraping #
 #-----------------------#
-    my $table = ($tree->find_by_tag_name('table'))[3];
+    my $table = ($tree->find_by_tag_name('table'))[4];
     my @rows = $table->content_list;
 
     my @jobs;
