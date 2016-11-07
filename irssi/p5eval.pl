@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright (c) 2012-2013, 2015 Steven Schubiger
+# Copyright (c) 2012-2013, 2015-2016 Steven Schubiger
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,21 +27,23 @@ use IPC::Open3 qw(open3);
 use Irssi;
 use Symbol qw(gensym);
 
-my $VERSION = '0.05';
+my $VERSION = '0.06';
 
 #-----------------------
 # Start of configuration
 #-----------------------
 
-my $perl      = '/home/sts/perl/perl-5.20.2/bin/perl';
+my $perl      = '/home/sts/perl/perl-5.24.0/bin/perl';
 my $jail      = 'jail';
 my $user_name = 'p5eval';
 my $timeout   = 5;
-my $source    = 'http://stsc.refcnt.org/code/p5eval.pl';
+my $source    = 'https://github.com/stsc/scripts/blob/master/irssi/p5eval.pl';
 
 #---------------------
 # End of configuration
 #---------------------
+
+my $limit = 1024 ** 2 * 75;
 
 sub process_perl_code
 {
@@ -64,8 +66,6 @@ sub process_perl_code
     }
 
     Irssi::print("perl code for $target");
-
-    my $limit = 1024 ** 2 * 75;
 
     my $eval_dir = catfile(tmpdir(), $user_name);
 
