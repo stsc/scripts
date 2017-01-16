@@ -66,20 +66,21 @@ sub fetch_url_title
             next;
         }
         if ($response->is_success && $response->headers->content_is_text) {
-            my $content = $response->content;
-            my ($title) = $content =~ m{<title(?:\s+.*?)?>(.+?)</title>}is;
-            if (defined $title && $title =~ /\S/) {
-                $title = Encode::decode('UTF-8', $title);
-                $title =~ s/[\r\n]/ /g;
-                $scrub_whitespace->(\$title);
-                $title =~ s/\s{2,}/ /g;
-                decode_entities($title);
-                $server->command("msg $target [ $title ]");
-                Irssi::print("url title for $target");
-            }
-            elsif ($content =~ m{<title(?:\s+.*?)?>\s*</title>}is) {
-                $server->command("msg $target [ Untitled document ]");
-                Irssi::print("empty url title for $target");
+            if ($response->content =~ m{<title(?:\s+.*?)?>(.*?)</title>}is) {
+                my $title = $1;
+                if ($title =~ /\S/) {
+                    $title = Encode::decode('UTF-8', $title);
+                    $title =~ s/[\r\n]/ /g;
+                    $scrub_whitespace->(\$title);
+                    $title =~ s/\s{2,}/ /g;
+                    decode_entities($title);
+                    $server->command("msg $target [ $title ]");
+                    Irssi::print("url title for $target");
+                }
+                else {
+                    $server->command("msg $target [ Untitled document ]");
+                    Irssi::print("empty url title for $target");
+                }
             }
         }
     }
