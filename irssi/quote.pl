@@ -13,7 +13,7 @@ my $quote_dir = File::Spec->catfile(File::HomeDir->my_home, '.irssi', 'scripts',
 sub quote
 {
     my ($server, $data, $nick, $addr, $target) = @_;
-    return unless $data =~ /^[?!]quote/;
+    return unless $data =~ /^[?!]quote\b/;
 
     opendir(my $dh, $quote_dir) or die "Cannot open $quote_dir: $!\n";
     my @persons = sort grep !/^\.\.?$/, readdir($dh);
