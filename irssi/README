@@ -1,0 +1,9 @@
+irssi scripts
+=============
+These perl scripts are supposed to be run under irssi[1], preferably
+handled by a session manager.  Even though these scripts are not
+part of the official "Irssi's Script Repository"[2], the instructions
+there on running, re-running, unloading, etc. apply nevertheless.
+
+1: https://irssi.org/
+2: https://scripts.irssi.org/
