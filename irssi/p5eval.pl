@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright (c) 2012-2013, 2015-2016 Steven Schubiger
+# Copyright (c) 2012-2013, 2015-2017 Steven Schubiger
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,13 +27,17 @@ use IPC::Open3 qw(open3);
 use Irssi;
 use Symbol qw(gensym);
 
-my $VERSION = '0.06';
+my $VERSION = '0.07';
 
 #-----------------------
 # Start of configuration
 #-----------------------
 
-my $perl      = '/home/sts/perl/perl-5.24.0/bin/perl';
+my $path = {
+    pre  => '/home/sts/perl',
+    post => 'bin/perl',
+};
+my $default   = '5.24.1';
 my $jail      = 'jail';
 my $user_name = 'p5eval';
 my $timeout   = 5;
@@ -52,8 +56,28 @@ sub process_perl_code
 
     my $user = $1;
 
+    my ($perl, $version);
+    my $version_regex = qr/^v(5\.\d{1,2}(?:\.\d{1,2})?):\s*/;
+    if ($user =~ $version_regex) {
+        $version = $1;
+        $user =~ s/$version_regex//;
+        $perl = catfile($path->{pre}, "perl-$version", $path->{post});
+    }
+    elsif ($user =~ /^v.*?:/) {
+        $server->command("msg $target $nick: invalid version");
+        return;
+    }
+    else {
+        $version = undef;
+        $perl = catfile($path->{pre}, "perl-$default", $path->{post});
+    }
+    unless (-e $perl && -x _) {
+        $server->command("msg $target $nick: perl does not exist or not executable");
+        return;
+    }
+
     if ($user =~ /^(?:\?|help)$/i) {
-        $server->command("msg $target $nick: Usage p5eval: <perl5 code>");
+        $server->command("msg $target $nick: Usage p5eval: [vVERSION:] <perl5 code>");
         return;
     }
     elsif ($user =~ /^source$/i) {
@@ -188,7 +212,8 @@ EOT
         unlink $jail_script;
 
         if (length $output) {
-            $server->command("msg $target $nick: $output");
+            my $v = defined $version ? "[v$version]" : '';
+            $server->command("msg $target $nick: $output $v");
         }
         else {
             $server->command("msg $target $nick: No output");
