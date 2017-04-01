@@ -27,7 +27,7 @@ use IPC::Open3 qw(open3);
 use Irssi;
 use Symbol qw(gensym);
 
-my $VERSION = '0.07';
+my $VERSION = '0.08';
 
 #-----------------------
 # Start of configuration
@@ -212,8 +212,8 @@ EOT
         unlink $jail_script;
 
         if (length $output) {
-            my $v = defined $version ? "[v$version]" : '';
-            $server->command("msg $target $nick: $output $v");
+            my $v = defined $version ? " [v$version]" : '';
+            $server->command("msg $target $nick: $output$v");
         }
         else {
             $server->command("msg $target $nick: No output");
