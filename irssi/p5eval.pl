@@ -17,6 +17,7 @@
 
 use strict;
 use warnings;
+use version 0.77;
 use constant false => 0;
 
 use File::Basename qw(fileparse);
@@ -27,7 +28,7 @@ use IPC::Open3 qw(open3);
 use Irssi;
 use Symbol qw(gensym);
 
-my $VERSION = '0.08';
+my $VERSION = '0.09';
 
 #-----------------------
 # Start of configuration
@@ -37,7 +38,7 @@ my $path = {
     pre  => '/home/sts/perl',
     post => 'bin/perl',
 };
-my $default   = '5.24.1';
+my $default   = '5.26.0';
 my $jail      = 'jail';
 my $user_name = 'p5eval';
 my $timeout   = 5;
@@ -77,7 +78,18 @@ sub process_perl_code
     }
 
     if ($user =~ /^(?:\?|help)$/i) {
-        $server->command("msg $target $nick: Usage p5eval: [vVERSION:] <perl5 code>");
+        $server->command("msg $target $nick: Usage p5eval: perls | [vVERSION:] <perl5 code>");
+        return;
+    }
+    elsif ($user =~ /^perls$/i) {
+        opendir(my $dh, $path->{pre}) or die "Cannot open directory $path->{pre}: $!";
+        my $perls = join ', ',
+                    sort { version->parse($b) <=> version->parse($a) }
+                    map "v$_",
+                    map /^perl-(.+)$/,
+                    readdir($dh);
+        closedir($dh);
+        $server->command("msg $target $nick: $perls");
         return;
     }
     elsif ($user =~ /^source$/i) {
