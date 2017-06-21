@@ -85,7 +85,7 @@ sub fetch_url_title
         }
         elsif ($response->is_error($response->code)) {
             my $status = $response->status_line;
-            $server->command("msg $target $status");
+            $server->command("msg $target $status [$url]");
             Irssi::print("status line for $target");
         }
     }
