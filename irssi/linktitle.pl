@@ -57,7 +57,7 @@ sub fetch_url_title
             %options = ();
         }
         else {
-            %options = (max_size => 1024 * 1024);
+            %options = (max_size => 1024 ** 2);
         }
         my $ua = LWP::UserAgent->new(%options);
         $ua->ssl_opts(SSL_verify_mode => SSL_VERIFY_NONE);
