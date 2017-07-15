@@ -3,6 +3,7 @@
 
 use strict;
 use warnings;
+use constant max_size => 1024 ** 2 * 10;
 
 use Encode;
 use Irssi;
@@ -51,13 +52,13 @@ sub fetch_url_title
         my %options;
         my $size = HTTP::Size::get_size($url);
         if (defined $size) {
-            if (int($size / 1024) > 1024) {
+            if ($size > max_size) {
                 next;
             }
             %options = ();
         }
         else {
-            %options = (max_size => 1024 ** 2);
+            %options = (max_size => max_size);
         }
         my $ua = LWP::UserAgent->new(%options);
         $ua->ssl_opts(SSL_verify_mode => SSL_VERIFY_NONE);
