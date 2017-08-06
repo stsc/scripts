@@ -7,11 +7,11 @@ use Irssi;
 use JSON qw(decode_json);
 use LWP::UserAgent;
 
-my $VERSION = '0.02';
+my $VERSION = '0.03';
 
 my %base_urls = (
-    api_release => 'http://api.metacpan.org/v0/release/_search',
-    api_file    => 'http://api.metacpan.org/v0/file/_search',
+    api_release => 'https://fastapi.metacpan.org/v1/release/_search',
+    api_file    => 'https://fastapi.metacpan.org/v1/file/_search',
     release     => 'https://metacpan.org/release',
 );
 
@@ -41,8 +41,8 @@ sub prepare_json
     my %json = (
         api_release => <<"JSON",
 {
-    "query": { "term": { "release.distribution": "$arg" } },
-    "filter": { "term": { "release.status": "latest" } },
+    "query": { "term": { "distribution": "$arg" } },
+    "filter": { "term": { "status": "latest" } },
     "sort": { "version": { "order": "desc" } },
     "fields": [ "author", "name" ]
 }
@@ -52,8 +52,8 @@ JSON
      "query": { "filtered": {
          "query": { "match_all": {} },
              "filter": { "and": [
-                 { "term": { "file.module.name": "$arg" } },
-                 { "term": { "file.status": "latest" } }
+                 { "term": { "module.name": "$arg" } },
+                 { "term": { "status": "latest" } }
              ]}
          }
      },
