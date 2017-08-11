@@ -4,11 +4,11 @@
 use strict;
 use warnings;
 use constant max_size => 1024 ** 2 * 10;
+use constant timeout  => 3;
 
 use Encode;
 use Irssi;
 use HTML::Entities;
-use HTTP::Size;
 use IO::Socket::SSL;
 use LWP::UserAgent;
 
@@ -49,21 +49,22 @@ sub fetch_url_title
     }
 
     foreach my $url (@urls) {
-        my %options;
-        my $size = HTTP::Size::get_size($url);
-        if (defined $size) {
-            if ($size > max_size) {
-                next;
-            }
-            %options = ();
-        }
-        else {
-            %options = (max_size => max_size);
-        }
-        my $ua = LWP::UserAgent->new(%options);
+        my $ua = LWP::UserAgent->new;
         $ua->ssl_opts(SSL_verify_mode => SSL_VERIFY_NONE);
-        my $response = $ua->get($url);
-        if (exists $options{max_size} && $response->header('Client-Aborted')) {
+        $ua->max_size(max_size);
+        $ua->timeout(timeout);
+        my $response;
+        eval {
+            local $SIG{ALRM} = sub { die "alarm\n" };
+            alarm timeout;
+            $response = $ua->get($url);
+            alarm 0;
+        };
+        if ($@) {
+            warn $@ unless $@ eq "alarm\n";
+            next;
+        }
+        if ($response->header('Client-Aborted')) {
             next;
         }
         if ($response->is_success && $response->headers->content_is_text) {
