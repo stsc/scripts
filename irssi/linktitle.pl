@@ -71,7 +71,8 @@ sub fetch_url_title
             if ($response->content =~ m{<title(?:\s+.*?)?>(.*?)</title>}is) {
                 my $title = $1;
                 if ($title =~ /\S/) {
-                    $title = Encode::decode('UTF-8', $title);
+                    my $s;
+                    eval { $s = Encode::decode('UTF-8', $title, Encode::FB_CROAK); 1 } and $title = $s;
                     $title =~ s/[\r\n]/ /g;
                     $scrub_whitespace->(\$title);
                     $title =~ s/\s{2,}/ /g;
