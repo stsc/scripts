@@ -9,6 +9,7 @@ use constant timeout  => 3;
 use Encode;
 use Irssi;
 use HTML::Entities;
+use Image::Size;
 use IO::Socket::SSL;
 use LWP::UserAgent;
 
@@ -67,22 +68,32 @@ sub fetch_url_title
         if ($response->header('Client-Aborted')) {
             next;
         }
-        if ($response->is_success && $response->headers->content_is_text) {
-            if ($response->content =~ m{<title(?:\s+.*?)?>(.*?)</title>}is) {
-                my $title = $1;
-                if ($title =~ /\S/) {
-                    my $s;
-                    eval { $s = Encode::decode('UTF-8', $title, Encode::FB_CROAK); 1 } and $title = $s;
-                    $title =~ s/[\r\n]/ /g;
-                    $scrub_whitespace->(\$title);
-                    $title =~ s/\s{2,}/ /g;
-                    decode_entities($title);
-                    $server->command("msg $target [ $title ]");
-                    Irssi::print("url title for $target");
+        if ($response->is_success) {
+            if ($response->headers->content_is_text) {
+                if ($response->content =~ m{<title(?:\s+.*?)?>(.*?)</title>}is) {
+                    my $title = $1;
+                    if ($title =~ /\S/) {
+                        my $s;
+                        eval { $s = Encode::decode('UTF-8', $title, Encode::FB_CROAK); 1 } and $title = $s;
+                        $title =~ s/[\r\n]/ /g;
+                        $scrub_whitespace->(\$title);
+                        $title =~ s/\s{2,}/ /g;
+                        decode_entities($title);
+                        $server->command("msg $target [ $title ]");
+                        Irssi::print("url title for $target");
+                    }
+                    else {
+                        $server->command("msg $target [ Untitled document ]");
+                        Irssi::print("empty url title for $target");
+                    }
                 }
-                else {
-                    $server->command("msg $target [ Untitled document ]");
-                    Irssi::print("empty url title for $target");
+            }
+            else {
+                my $img = $response->content;
+                my ($x, $y, $id) = imgsize(\$img);
+                if (defined $x) {
+                    $server->command("msg $target [ ${\lc $id} ($x x $y) ]");
+                    Irssi::print("image size for $target");
                 }
             }
         }
