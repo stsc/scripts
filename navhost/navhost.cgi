@@ -30,7 +30,7 @@ use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.10';
+my $VERSION = '0.11';
 
 my (%config, %html, %icons, $icons_path, %params, $prot, $query);
 
@@ -148,7 +148,8 @@ sub read_dir_listing
         }->($params{path});
 
         if ($entry eq updir()) {
-            print subst_up_dir($entry, $html_body, $config{icons}->{folder});
+            subst_up_dir($entry, \$html_body, $config{icons}->{folder});
+            print $html_body;
             next;
         }
         subst_entry_image(\$html_body, $image);
@@ -177,12 +178,10 @@ sub subst_up_dir
 
     my $script_url = get_script_url(path => $path_updir);
 
-    html_populate(\$html, 'entry_image', qq(<img src="$image" alt="folder">));
-    html_populate(\$html, 'entry_name',  qq(<a href="$script_url">$entry</a>));
+    html_populate($html, 'entry_image', qq(<img src="$image" alt="folder">));
+    html_populate($html, 'entry_name',  qq(<a href="$script_url">$entry</a>));
 
-    $html =~ s/\$\w+//g;
-
-    return $html;
+    $$html =~ s/\$\w+//g;
 }
 
 sub subst_entry_image
