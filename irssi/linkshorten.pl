@@ -22,8 +22,8 @@ sub shorten_url
     foreach my $url (@urls) {
         next unless length $url > 78;
         push @shortened, makeashorterlink($url);
-    }
-    @shortened = grep defined, @shortened;
+    }                  # hack
+    @shortened = map { s{^http(?=://)}{https}; $_ } grep defined, @shortened;
     return unless @shortened;
 
     my $output = (@shortened > 1)
