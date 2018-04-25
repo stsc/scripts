@@ -30,7 +30,7 @@ use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.11';
+my $VERSION = '0.12';
 
 my (%config, %html, %icons, $icons_path, %params, $prot, $query);
 
@@ -56,9 +56,7 @@ $icons_path = '/~sts/images';
     $params{all}  = do { local $_ = $query->param('all'); defined $_ ? $_ : false };
 
     $config{script_url} = join '', ("$prot://", $ENV{SERVER_NAME}, ":$ENV{SERVER_PORT}", $ENV{SCRIPT_NAME});
-
-    %icons = map { $_ => join '/', ($icons_path, $icons{$_}) } keys %icons;
-    $config{icons} = \%icons;
+    $config{icons}      = { map { $_ => join '/', ($icons_path, $icons{$_}) } keys %icons };
 
     parse_templates();
     read_dir_listing();
