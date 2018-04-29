@@ -30,10 +30,11 @@ use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.14';
+my $VERSION = '0.15';
 
 my (%config,
     @entry_color,
+    $header_color,
     %html,
     %icons,
     $icons_path,
@@ -51,6 +52,7 @@ $icons_path = '/~sts/images';
     file   => 'file.png',
     folder => 'folder.png',
 );
+$header_color = '#e3e3e3';
 @entry_color = ('#e3e3e3', '#ffffff');
 
 #---------------------
@@ -125,6 +127,7 @@ sub read_dir_listing
     foreach my $place_holder (keys %subst) {
         html_populate(\$html_header, $place_holder, $subst{$place_holder});
     }
+    html_populate(\$html_header, 'header_color', $header_color);
 
     print $query->header('text/html');
     print $html_header;
@@ -343,7 +346,7 @@ __DATA__
       <tr>
         <td colspan="9"><hr size="1"></td>
       </tr>
-      <tr bgcolor="#e3e3e3">
+      <tr bgcolor="$HEADER_COLOR">
         <td colspan="2"><span class="data">name ($OPTION_ALL)</span></td>
         <td width="119"><span class="data">type/permissions</span></td>
         <td colspan="2"><span class="data">links</span></td>
