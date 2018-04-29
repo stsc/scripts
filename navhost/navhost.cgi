@@ -30,7 +30,7 @@ use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.13';
+my $VERSION = '0.14';
 
 my (%config,
     @entry_color,
@@ -163,7 +163,8 @@ sub read_dir_listing
         subst_entry_image(\$html_body, $image);
         subst_entry_name($entry, \$html_body);
         gather_attrs($entry, \%attrs);
-        subst_entry_attrs(\$html_body, \%attrs, $counter++);
+        subst_entry_attrs(\$html_body, \%attrs);
+        subst_entry_color(\$html_body, $counter++);
 
         print $html_body;
     }
@@ -277,11 +278,17 @@ sub gather_attrs
 
 sub subst_entry_attrs
 {
-    my ($html, $attrs, $counter) = @_;
+    my ($html, $attrs) = @_;
 
     foreach my $attr (keys %$attrs) {
         html_populate($html, "entry_$attr", $attrs->{$attr});
     }
+}
+
+sub subst_entry_color
+{
+    my ($html, $counter) = @_;
+
     html_populate($html, 'entry_color', $entry_color[$counter % 2 == 0 ? 1 : 0]);
 }
 
