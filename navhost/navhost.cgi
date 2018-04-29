@@ -30,9 +30,16 @@ use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.12';
+my $VERSION = '0.13';
 
-my (%config, %html, %icons, $icons_path, %params, $prot, $query);
+my (%config,
+    @entry_color,
+    %html,
+    %icons,
+    $icons_path,
+    %params,
+    $prot,
+    $query);
 
 #-----------------------
 # Start of configuration
@@ -44,6 +51,7 @@ $icons_path = '/~sts/images';
     file   => 'file.png',
     folder => 'folder.png',
 );
+@entry_color = ('#e3e3e3', '#ffffff');
 
 #---------------------
 # End of configuration
@@ -130,6 +138,8 @@ sub read_dir_listing
           @_
     };
 
+    my $counter = 1;
+
     foreach my $entry ($sort->(readdir($dh))) {
         my %skipable = (
             curdir => $entry eq curdir(),
@@ -153,7 +163,7 @@ sub read_dir_listing
         subst_entry_image(\$html_body, $image);
         subst_entry_name($entry, \$html_body);
         gather_attrs($entry, \%attrs);
-        subst_entry_attrs(\$html_body, \%attrs);
+        subst_entry_attrs(\$html_body, \%attrs, $counter++);
 
         print $html_body;
     }
@@ -267,11 +277,12 @@ sub gather_attrs
 
 sub subst_entry_attrs
 {
-    my ($html, $attrs) = @_;
+    my ($html, $attrs, $counter) = @_;
 
     foreach my $attr (keys %$attrs) {
         html_populate($html, "entry_$attr", $attrs->{$attr});
     }
+    html_populate($html, 'entry_color', $entry_color[$counter % 2 == 0 ? 1 : 0]);
 }
 
 sub html_populate
@@ -354,7 +365,7 @@ __DATA__
       </tr>
 <!--END HEADER-->
 <!--BEGIN BODY-->
-      <tr>
+      <tr bgcolor="$ENTRY_COLOR">
         <td width="18">$ENTRY_IMAGE</td>
         <td width="170"><span class="text">$ENTRY_NAME</span></td>
         <td width="119"><span class="data">$ENTRY_PERMS</span></td>
