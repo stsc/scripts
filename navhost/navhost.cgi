@@ -53,7 +53,7 @@ $icons_path = '/~sts/images';
     folder => 'folder.png',
 );
 $header_color = '#e3e3e3';
-@entry_color = ('#e3e3e3', '#ffffff');
+@entry_color = ('#e8e8e8', '#ffffff');
 
 #---------------------
 # End of configuration
