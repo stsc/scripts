@@ -30,7 +30,7 @@ use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.15';
+my $VERSION = '0.16';
 
 my (%config,
     @entry_color,
@@ -123,11 +123,11 @@ sub read_dir_listing
         folder_root  => qq(<a href="$script_url_root">/ (root)</a>),
         folder_home  => qq(<a href="$script_url_home">~ (home)</a>),
         folder_curr  => qq(<a href="$script_url_curr">. (current)</a>),
+        header_color => qq($header_color),
     );
     foreach my $place_holder (keys %subst) {
         html_populate(\$html_header, $place_holder, $subst{$place_holder});
     }
-    html_populate(\$html_header, 'header_color', $header_color);
 
     print $query->header('text/html');
     print $html_header;
