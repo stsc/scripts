@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright (c) 2012-2013, 2015-2017 Steven Schubiger
+# Copyright (c) 2012-2013, 2015-2018 Steven Schubiger
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 use strict;
 use warnings;
 use version 0.77;
+use constant true  => 1;
 use constant false => 0;
 
 use File::Basename qw(fileparse);
@@ -28,7 +29,7 @@ use IPC::Open3 qw(open3);
 use Irssi;
 use Symbol qw(gensym);
 
-my $VERSION = '0.09';
+my $VERSION = '0.10';
 
 #-----------------------
 # Start of configuration
@@ -50,6 +51,33 @@ my $source    = 'https://github.com/stsc/scripts/blob/master/irssi/p5eval.pl';
 
 my $limit = 1024 ** 2 * 75;
 
+sub get_interp_path
+{
+    my ($user, $perl, $version, $server, $target, $nick) = @_;
+
+    my $version_regex = qr/^v(5\.\d{1,2}(?:\.\d{1,2})?):\s*/;
+    if ($$user =~ $version_regex) {
+        $$version = $1;
+        $$user =~ s/$version_regex//;
+        $$perl = catfile($path->{pre}, "perl-$$version", $path->{post});
+    }
+    elsif ($$user =~ /^v.*?:/) {
+        $server->command("msg $target $nick: invalid version");
+        return false;
+    }
+    else {
+        $$version = undef;
+        $$perl = catfile($path->{pre}, "perl-$default", $path->{post});
+    }
+
+    unless (-e $$perl && -x _) {
+        $server->command("msg $target $nick: perl does not exist or not executable");
+        return false;
+    }
+
+    return true;
+}
+
 sub process_perl_code
 {
     my ($server, $data, $nick, $addr, $target) = @_;
@@ -58,24 +86,7 @@ sub process_perl_code
     my $user = $1;
 
     my ($perl, $version);
-    my $version_regex = qr/^v(5\.\d{1,2}(?:\.\d{1,2})?):\s*/;
-    if ($user =~ $version_regex) {
-        $version = $1;
-        $user =~ s/$version_regex//;
-        $perl = catfile($path->{pre}, "perl-$version", $path->{post});
-    }
-    elsif ($user =~ /^v.*?:/) {
-        $server->command("msg $target $nick: invalid version");
-        return;
-    }
-    else {
-        $version = undef;
-        $perl = catfile($path->{pre}, "perl-$default", $path->{post});
-    }
-    unless (-e $perl && -x _) {
-        $server->command("msg $target $nick: perl does not exist or not executable");
-        return;
-    }
+    return unless get_interp_path(\$user, \$perl, \$version, $server, $target, $nick);
 
     if ($user =~ /^(?:\?|help)$/i) {
         $server->command("msg $target $nick: Usage p5eval: perls | [vVERSION:] <perl5 code>");
