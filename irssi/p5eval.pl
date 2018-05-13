@@ -29,7 +29,7 @@ use IPC::Open3 qw(open3);
 use Irssi;
 use Symbol qw(gensym);
 
-my $VERSION = '0.10';
+my $VERSION = '0.11';
 
 #-----------------------
 # Start of configuration
@@ -78,19 +78,13 @@ sub get_interp_path
     return true;
 }
 
-sub process_perl_code
+sub handle_command
 {
-    my ($server, $data, $nick, $addr, $target) = @_;
-    return unless $data =~ /^p5eval[,:]\s+(.+)$/;
-
-    my $user = $1;
-
-    my ($perl, $version);
-    return unless get_interp_path(\$user, \$perl, \$version, $server, $target, $nick);
+    my ($user, $server, $target, $nick) = @_;
 
     if ($user =~ /^(?:\?|help)$/i) {
         $server->command("msg $target $nick: Usage p5eval: perls | [vVERSION:] <perl5 code>");
-        return;
+        return true;
     }
     elsif ($user =~ /^perls$/i) {
         opendir(my $dh, $path->{pre}) or die "Cannot open directory $path->{pre}: $!";
@@ -101,16 +95,31 @@ sub process_perl_code
                     readdir($dh);
         closedir($dh);
         $server->command("msg $target $nick: $perls");
-        return;
+        return true;
     }
     elsif ($user =~ /^source$/i) {
         $server->command("msg $target $nick: $source");
-        return;
+        return true;
     }
     elsif ($user =~ /^version$/i) {
         $server->command("msg $target $nick: v$VERSION");
-        return;
+        return true;
     }
+
+    return false;
+}
+
+sub process_perl_code
+{
+    my ($server, $data, $nick, $addr, $target) = @_;
+    return unless $data =~ /^p5eval[,:]\s+(.+)$/;
+
+    my $user = $1;
+
+    my ($perl, $version);
+    return unless get_interp_path(\$user, \$perl, \$version, $server, $target, $nick);
+
+    return if handle_command($user, $server, $target, $nick);
 
     Irssi::print("perl code for $target");
 
