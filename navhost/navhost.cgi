@@ -30,7 +30,7 @@ use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.16';
+my $VERSION = '0.17';
 
 my (%config,
     @entry_color,
@@ -64,6 +64,7 @@ $header_color = '#e3e3e3';
 
     $params{path} = $query->param('path') || rootdir();
     $params{all}  = do { local $_ = $query->param('all'); defined $_ ? $_ : false };
+    $params{asc}  = do { local $_ = $query->param('asc'); defined $_ ? $_ : true  };
 
     $config{script_url} = join '', ("$prot://", $ENV{SERVER_NAME}, ":$ENV{SERVER_PORT}", $ENV{SCRIPT_NAME});
     $config{icons}      = { map { $_ => join '/', ($icons_path, $icons{$_}) } keys %icons };
@@ -80,7 +81,7 @@ sub get_script_url
         $fields{$field} = $params{$field};
     }
 
-    return "$config{script_url}?" . join ';', map { "$_=" . uri_escape($fields{$_}) } qw(path all);
+    return "$config{script_url}?" . join ';', map { "$_=" . uri_escape($fields{$_}) } qw(path all asc);
 }
 
 sub parse_templates
@@ -107,18 +108,21 @@ sub read_dir_listing
 {
     opendir(my $dh, $params{path}) or read_file();
 
-    my $script_url_mode = get_script_url(all => $params{all} ? false : true);
+    my $script_url_mode = get_script_url(all  => $params{all} ? false : true);
     my $script_url_root = get_script_url(path => '/');
     my $script_url_home = get_script_url(path => (getpwuid((stat($0))[4]))[7]);
     my $script_url_curr = get_script_url(path => $params{path});
+    my $script_url_sort = get_script_url(asc  => $params{asc} ? false : true);
 
-    my $mode = $params{all} ? 'default' : 'all';
+    my $mode  = $params{all} ? 'default' : 'all';
+    my $order = $params{asc} ? 'desc'    : 'asc';
 
     my $html_header = $html{header};
 
     my %subst = (
         path         => qq($params{path}),
         option_all   => qq(<a href="$script_url_mode">toggle $mode</a>),
+        name_sort    => qq(<a href="$script_url_sort">$order</a>),
         folder_image => qq(<img src="$config{icons}->{folder}" alt="folder">),
         folder_root  => qq(<a href="$script_url_root">/ (root)</a>),
         folder_home  => qq(<a href="$script_url_home">~ (home)</a>),
@@ -134,10 +138,21 @@ sub read_dir_listing
 
     my $sort = sub
     {
-        return sort grep !/^\.[^.]/, @_ unless $params{all};
-        return map $_->[0],
-          sort { $a->[1] cmp $b->[1] }
-          map [ $_, substr($_, /^\.[^.]/ ? 1 : 0, length) ],
+        my @upper = grep  /^\.\.$/, @_;
+               @_ = grep !/^\.\.$/, @_;
+
+        return @upper, sort {
+          $params{asc}
+            ? $a cmp $b
+            : $b cmp $a
+          } grep !/^\.[^.]/,
+          @_ unless $params{all};
+
+        return @upper, map $_->[0],
+          sort { $params{asc}
+            ? $a->[1] cmp $b->[1]
+            : $b->[1] cmp $a->[1]
+          } map [ $_, substr($_, /^\.[^.]/ ? 1 : 0, length) ],
           @_
     };
 
@@ -347,7 +362,7 @@ __DATA__
         <td colspan="9"><hr size="1"></td>
       </tr>
       <tr bgcolor="$HEADER_COLOR">
-        <td colspan="2"><span class="data">name ($OPTION_ALL)</span></td>
+        <td colspan="2"><span class="data">name ($NAME_SORT)($OPTION_ALL)</span></td>
         <td width="119"><span class="data">type/permissions</span></td>
         <td colspan="2"><span class="data">links</span></td>
         <td width="63"><span class="data">owner</span></td>
@@ -377,7 +392,7 @@ __DATA__
 <!--BEGIN BODY-->
       <tr bgcolor="$ENTRY_COLOR">
         <td width="18">$ENTRY_IMAGE</td>
-        <td width="170"><span class="text">$ENTRY_NAME</span></td>
+        <td width="230"><span class="text">$ENTRY_NAME</span></td>
         <td width="119"><span class="data">$ENTRY_PERMS</span></td>
         <td width="20" align="right"><span class="data">$ENTRY_LINKS</span></td>
         <td width="2"></td>
