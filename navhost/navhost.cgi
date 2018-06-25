@@ -30,7 +30,7 @@ use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.17';
+my $VERSION = '0.18';
 
 my (%config,
     @entry_color,
@@ -153,7 +153,7 @@ sub read_dir_listing
             ? $a->[1] cmp $b->[1]
             : $b->[1] cmp $a->[1]
           } map [ $_, substr($_, /^\.[^.]/ ? 1 : 0, length) ],
-          @_
+          @_;
     };
 
     my $counter = 1;
