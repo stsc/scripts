@@ -2,12 +2,14 @@
 
 use strict;
 use warnings;
+use constant true  => 1;
+use constant false => 0;
 
 use Irssi;
 use JSON qw(decode_json);
 use LWP::UserAgent;
 
-my $VERSION = '0.03';
+my $VERSION = '0.04';
 
 my %base_urls = (
     api_release => 'https://fastapi.metacpan.org/v1/release/_search',
@@ -69,10 +71,24 @@ JSON
 sub fetch_cpan
 {
     my ($server, $data, $nick, $addr, $target) = @_;
-    return unless $data =~ /^!cpan\b/;
 
-    my @args = split /\s+/, $data;
-    shift @args;
+    my $implicit_re = qr/\b(\S+(?:\:\:\S+)+)\b/;
+
+    my (@args, $explicit);
+    if ($data =~ /^!cpan\b/) {
+        @args = split /\s+/, $data;
+        shift @args;
+        $explicit = true;
+    }
+    elsif ($data =~ $implicit_re) {
+        while ($data =~ /$implicit_re/g) {
+            push @args, $1;
+        }
+        $explicit = false;
+    }
+    else {
+        return;
+    }
 
     my $dist_name   = sub { local $_ = shift; s/::/-/g; $_ };
     my $module_name = sub { local $_ = shift; s/-/::/g; $_ };
@@ -81,33 +97,36 @@ sub fetch_cpan
         $server->command("msg $target !cpan distname");
     }
     elsif (@args) {
-        my $arg = shift @args;
-        my $dist = $dist_name->($arg);
+        while (my $arg = shift @args) {
+            my $dist = $dist_name->($arg);
 
-        my $dist_not_found = "Dist '$arg' not found";
+            my $dist_not_found = "Dist '$arg' not found";
 
-        my $meta = do_post($base_urls{api_release}, prepare_json('api_release', $dist));
-        my $hits = $meta->{hits}{hits};
-
-        if (@$hits) {
-            my $link = join '/', ($base_urls{release}, @{$hits->[0]{fields}}{qw(author name)});
-            $server->command("msg $target $link");
-        }
-        else {
-            my $module = $module_name->($arg);
-
-            my $meta = do_post($base_urls{api_file}, prepare_json('api_file', $module));
+            my $meta = do_post($base_urls{api_release}, prepare_json('api_release', $dist));
             my $hits = $meta->{hits}{hits};
 
             if (@$hits) {
-                my $link = join '/', ($base_urls{release}, @{$hits->[0]{fields}}{qw(author release)});
+                my $link = join '/', ($base_urls{release}, @{$hits->[0]{fields}}{qw(author name)});
+                $link .= " [$arg]" unless $explicit;
                 $server->command("msg $target $link");
             }
             else {
-                $server->command("msg $target $dist_not_found");
+                my $module = $module_name->($arg);
+
+                my $meta = do_post($base_urls{api_file}, prepare_json('api_file', $module));
+                my $hits = $meta->{hits}{hits};
+
+                if (@$hits) {
+                    my $link = join '/', ($base_urls{release}, @{$hits->[0]{fields}}{qw(author release)});
+                    $link .= " [$arg]" unless $explicit;
+                    $server->command("msg $target $link");
+                }
+                elsif ($explicit) {
+                    $server->command("msg $target $dist_not_found");
+                }
             }
+            Irssi::print("cpan query for $target");
         }
-        Irssi::print("cpan query for $target");
     }
 }
 
