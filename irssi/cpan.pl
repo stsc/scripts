@@ -9,7 +9,7 @@ use Irssi;
 use JSON qw(decode_json);
 use LWP::UserAgent;
 
-my $VERSION = '0.04';
+my $VERSION = '0.05';
 
 my %base_urls = (
     api_release => 'https://fastapi.metacpan.org/v1/release/_search',
@@ -94,7 +94,7 @@ sub fetch_cpan
     my $module_name = sub { local $_ = shift; s/-/::/g; $_ };
 
     if ($data =~ /^!cpan\s*$/) {
-        $server->command("msg $target !cpan distname");
+        $server->command("msg $target !cpan dist(s)");
     }
     elsif (@args) {
         while (my $arg = shift @args) {
