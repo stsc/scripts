@@ -30,7 +30,7 @@ use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.18';
+my $VERSION = '0.19';
 
 my (%config,
     @entry_color,
@@ -122,7 +122,7 @@ sub read_dir_listing
     my %subst = (
         path         => qq($params{path}),
         option_all   => qq(<a href="$script_url_mode">toggle $mode</a>),
-        name_sort    => qq(<a href="$script_url_sort">$order</a>),
+        name_sort    => qq(<a href="$script_url_sort">sort $order</a>),
         folder_image => qq(<img src="$config{icons}->{folder}" alt="folder">),
         folder_root  => qq(<a href="$script_url_root">/ (root)</a>),
         folder_home  => qq(<a href="$script_url_home">~ (home)</a>),
@@ -392,7 +392,7 @@ __DATA__
 <!--BEGIN BODY-->
       <tr bgcolor="$ENTRY_COLOR">
         <td width="18">$ENTRY_IMAGE</td>
-        <td width="230"><span class="text">$ENTRY_NAME</span></td>
+        <td width="270"><span class="text">$ENTRY_NAME</span></td>
         <td width="119"><span class="data">$ENTRY_PERMS</span></td>
         <td width="20" align="right"><span class="data">$ENTRY_LINKS</span></td>
         <td width="2"></td>
