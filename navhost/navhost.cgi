@@ -30,7 +30,7 @@ use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.19';
+my $VERSION = '0.20';
 
 my (%config,
     @entry_color,
@@ -128,6 +128,7 @@ sub read_dir_listing
         folder_home  => qq(<a href="$script_url_home">~ (home)</a>),
         folder_curr  => qq(<a href="$script_url_curr">. (current)</a>),
         header_color => qq($header_color),
+        version      => qq($VERSION),
     );
     foreach my $place_holder (keys %subst) {
         html_populate(\$html_header, $place_holder, $subst{$place_holder});
@@ -345,6 +346,7 @@ sub print_status
 
 __DATA__
 <!--BEGIN HEADER-->
+<!-- navhost v$VERSION - https://github.com/stsc/scripts/tree/master/navhost -->
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
        "http://www.w3.org/TR/html4/loose.dtd">
 <html>
