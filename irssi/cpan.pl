@@ -9,7 +9,7 @@ use Irssi;
 use JSON qw(decode_json);
 use LWP::UserAgent;
 
-my $VERSION = '0.05';
+my $VERSION = '0.06';
 
 my %base_urls = (
     api_release => 'https://fastapi.metacpan.org/v1/release/_search',
@@ -68,6 +68,8 @@ JSON
     return $json{$_[0]};
 }
 
+my %track;
+
 sub fetch_cpan
 {
     my ($server, $data, $nick, $addr, $target) = @_;
@@ -82,7 +84,12 @@ sub fetch_cpan
     }
     elsif ($data =~ $implicit_re) {
         while ($data =~ /$implicit_re/g) {
-            push @args, $1;
+            my $module = $1;
+            if (exists $track{$module}) {
+                next if (time - $track{$module}) < 600;
+            }
+            $track{$module} = time;
+            push @args, $module;
         }
         $explicit = false;
     }
