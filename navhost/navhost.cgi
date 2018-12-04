@@ -30,7 +30,7 @@ use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.20';
+my $VERSION = '0.21';
 
 my (%config,
     @entry_color,
@@ -62,9 +62,9 @@ $header_color = '#e3e3e3';
 {
     $query = CGI->new;
 
-    $params{path} = $query->param('path') || rootdir();
-    $params{all}  = do { local $_ = $query->param('all'); defined $_ ? $_ : false };
-    $params{asc}  = do { local $_ = $query->param('asc'); defined $_ ? $_ : true  };
+    $params{path} = do { local $_ = $query->param('path'); defined $_ ? $_ : rootdir() };
+    $params{all}  = do { local $_ = $query->param('all');  defined $_ ? $_ : false     };
+    $params{asc}  = do { local $_ = $query->param('asc');  defined $_ ? $_ : true      };
 
     $config{script_url} = join '', ("$prot://", $ENV{SERVER_NAME}, ":$ENV{SERVER_PORT}", $ENV{SCRIPT_NAME});
     $config{icons}      = { map { $_ => join '/', ($icons_path, $icons{$_}) } keys %icons };
