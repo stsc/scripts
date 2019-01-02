@@ -2,7 +2,7 @@
 #
 # navhost - List/view remote files in browser
 #
-# Copyright (c) 2009-2013, 2016, 2018 Steven Schubiger
+# Copyright (c) 2009-2013, 2016, 2018-2019 Steven Schubiger
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.21';
+my $VERSION = '0.22';
 
 my (%config,
     @entry_color,
@@ -190,7 +190,10 @@ sub read_dir_listing
 
     closedir($dh);
 
-    print $html{footer};
+    my $html_footer = $html{footer};
+    html_populate(\$html_footer, 'last_generated', strftime('%Y-%m-%d %H:%M:%S %Z', localtime));
+
+    print $html_footer;
     exit;
 }
 
@@ -406,7 +409,13 @@ __DATA__
 <!--END BODY-->
 <!--BEGIN FOOTER-->
       <tr>
-        <td colspan="9">&nbsp;</td>
+        <td colspan="9"><hr size="1"></td>
+      </tr>
+      <tr>
+        <td colspan="9"><span class="text">Last generated: $LAST_GENERATED</span></td>
+      </tr>
+      <tr>
+        <td colspan="9"><hr size="1"></td>
       </tr>
     </table>
   </body>
