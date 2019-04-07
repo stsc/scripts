@@ -9,7 +9,7 @@ use Irssi;
 use JSON qw(decode_json);
 use LWP::UserAgent;
 
-my $VERSION = '0.06';
+my $VERSION = '0.07';
 
 my %base_urls = (
     api_release => 'https://fastapi.metacpan.org/v1/release/_search',
@@ -55,7 +55,8 @@ JSON
          "query": { "match_all": {} },
              "filter": { "and": [
                  { "term": { "module.name": "$arg" } },
-                 { "term": { "status": "latest" } }
+                 { "term": { "status": "latest" } },
+                 { "term": { "module.authorized": "true" } }
              ]}
          }
      },
