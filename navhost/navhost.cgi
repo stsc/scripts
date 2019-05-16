@@ -30,7 +30,7 @@ use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.22';
+my $VERSION = '0.23';
 
 my (%config,
     @entry_color,
@@ -429,7 +429,7 @@ __DATA__
     <title>navhost: $PATH</title>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <style type="text/css">
-      .text { font-family: Arial, Helvetica,, sans-serif; font-size: small }
+      .text { font-family: Arial, Helvetica, sans-serif; font-size: small }
     </style>
   </head>
   <body>
