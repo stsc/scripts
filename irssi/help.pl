@@ -25,6 +25,8 @@ list
 !quote random or <person> [/keyword/]
 ?quote <person> (mtime|total)
 !seen <nickname>
+!time [<time zone>]
+?time [<category> or <country code>]
 EOT
         $server->command("msg $target Usage: $commands");
     }
