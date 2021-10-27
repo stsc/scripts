@@ -42,7 +42,7 @@ sub get_time
         }
     }
     elsif ($data =~ /^!time (?:\s+ (\S+))? \s* $/x) {
-        my $tz = $1 || 'UTC';
+        my $tz = $1 // 'UTC';
         if (DateTime::TimeZone->is_valid_name($tz)) {
             my $dt = DateTime->now(time_zone => $tz);
             my $time = $dt->strftime('%a, %Y-%m-%d at %H:%M:%S');
