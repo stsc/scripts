@@ -21,8 +21,8 @@ sub getopts
     my %opts;
 
     if (@ARGV) {
-        GetOptions(\%opts, 'col=i', 'help', 'numeric', 'rx=s', 'reverse', 'skip=i') or usage();
-        usage() if $opts{help};
+        GetOptions(\%opts, 'col=i', 'h|help', 'numeric', 'rx=s', 'reverse', 'skip=i') or usage();
+        usage() if $opts{h};
 
         $numeric = $opts{numeric};
     }
@@ -34,7 +34,7 @@ sub getopts
 
 sub usage
 {
-    print "$0 [ --col=n, --help, --numeric, --rx=regexp, --reverse, --skip=n ]\n";
+    print "$0 [ --col=n, -h|--help, --numeric, --rx=regexp, --reverse, --skip=n ]\n";
     exit;
 }
 
