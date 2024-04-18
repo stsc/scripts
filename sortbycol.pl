@@ -34,7 +34,7 @@ sub getopts
 
 sub usage
 {
-    print "$0 [ --col=n, -h|--help, --numeric, --rx=regexp, --reverse, --skip=n ]\n";
+    warn "$0 [ --col=n, -h|--help, --numeric, --rx=regexp, --reverse, --skip=n ]\n";
     exit;
 }
 
