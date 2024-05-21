@@ -19,11 +19,12 @@
 
 use strict;
 use warnings;
-use constant true => 1;
+use constant true  => 1;
+use constant false => 0;
 
 use Getopt::Long qw(:config no_auto_abbrev no_ignore_case);
 
-my $numeric;
+my $numeric = false;
 
 {
     my $opts = getopts();
@@ -35,13 +36,11 @@ my $numeric;
 
 sub getopts
 {
-    my %opts;
+    my %opts = ('numeric' => \$numeric);
 
     if (@ARGV) {
         GetOptions(\%opts, 'col=i', 'h|help', 'numeric', 'rx=s', 'reverse', 'skip=i') or usage();
         usage() if $opts{h};
-
-        $numeric = $opts{numeric};
     }
 
     $opts{col} ||= 1;
