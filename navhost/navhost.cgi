@@ -2,7 +2,7 @@
 #
 # navhost - List/view remote files in browser
 #
-# Copyright (c) 2009-2013, 2016, 2018-2019 Steven Schubiger
+# Copyright (c) 2009-2013, 2016, 2018-2019, 2024 Steven Schubiger
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.23';
+my $VERSION = '0.24';
 
 my (%config,
     @entry_color,
@@ -389,6 +389,12 @@ __DATA__
           $FOLDER_IMAGE
           <span class="text">$FOLDER_CURR</span>
         </td>
+      </tr>
+      <tr>
+        <td colspan="9"><hr size="1"></td>
+      </tr>
+      <tr>
+        <td colspan="9"><span class="text">current folder: <b>$PATH</b></span></td>
       </tr>
       <tr>
         <td colspan="9"><hr size="1"></td>
