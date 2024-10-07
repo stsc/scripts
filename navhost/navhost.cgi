@@ -30,7 +30,7 @@ use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.24';
+my $VERSION = '0.25';
 
 my (%config,
     @entry_color,
@@ -352,7 +352,7 @@ __DATA__
 <!-- navhost v$VERSION - https://github.com/stsc/scripts/tree/master/navhost -->
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
        "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<html lang="en">
   <head>
     <title>navhost: $PATH</title>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
@@ -430,7 +430,7 @@ __DATA__
 ###
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
        "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<html lang="en">
   <head>
     <title>navhost: $PATH</title>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
