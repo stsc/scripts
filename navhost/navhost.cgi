@@ -30,7 +30,7 @@ use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.25';
+my $VERSION = '0.26';
 
 my (%config,
     @entry_color,
@@ -121,8 +121,8 @@ sub read_dir_listing
 
     my %subst = (
         path         => qq($params{path}),
-        option_all   => qq(<a href="$script_url_mode">toggle $mode</a>),
-        name_sort    => qq(<a href="$script_url_sort">sort $order</a>),
+        option_all   => qq(<a href="$script_url_mode">toggle <b>$mode</b></a>),
+        name_sort    => qq(<a href="$script_url_sort">sort <b>$order</b></a>),
         folder_image => qq(<img src="$config{icons}->{folder}" alt="folder">),
         folder_root  => qq(<a href="$script_url_root">/ (root)</a>),
         folder_home  => qq(<a href="$script_url_home">~ (home)</a>),
@@ -357,8 +357,8 @@ __DATA__
     <title>navhost: $PATH</title>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <style type="text/css">
-      .data { font-family: Courier, Monospace; font-size: small }
-      .text { font-family: Arial, Helvetica, sans-serif; font-size: small }
+      .data { font-family: Courier, Monospace; font-size: small; padding: 2.5px }
+      .text { font-family: Arial, Helvetica, sans-serif; font-size: small; padding: 2.5px }
     </style>
   </head>
   <body>
@@ -368,11 +368,11 @@ __DATA__
       </tr>
       <tr bgcolor="$HEADER_COLOR">
         <td colspan="2"><span class="data">name ($NAME_SORT)($OPTION_ALL)</span></td>
-        <td width="119"><span class="data">type/permissions</span></td>
+        <td width="145"><span class="data">type/permissions</span></td>
         <td colspan="2"><span class="data">links</span></td>
-        <td width="63"><span class="data">owner</span></td>
-        <td width="63"><span class="data">group</span></td>
-        <td width="70"><span class="data">size</span></td>
+        <td width="120"><span class="data">owner</span></td>
+        <td width="120"><span class="data">group</span></td>
+        <td width="90"><span class="data">size</span></td>
         <td width="180"><span class="data">modification time</span></td>
       </tr>
       <tr>
@@ -403,13 +403,13 @@ __DATA__
 <!--BEGIN BODY-->
       <tr bgcolor="$ENTRY_COLOR">
         <td width="18">$ENTRY_IMAGE</td>
-        <td width="270"><span class="text">$ENTRY_NAME</span></td>
-        <td width="119"><span class="data">$ENTRY_PERMS</span></td>
-        <td width="20" align="right"><span class="data">$ENTRY_LINKS</span></td>
-        <td width="2"></td>
-        <td width="63"><span class="data">$ENTRY_OWNER</span></td>
-        <td width="63"><span class="data">$ENTRY_GROUP</span></td>
-        <td width="70"><span class="data">$ENTRY_SIZE</span></td>
+        <td width="300"><span class="text">$ENTRY_NAME</span></td>
+        <td width="145"><span class="data">$ENTRY_PERMS</span></td>
+        <td width="40" align="right"><span class="data">$ENTRY_LINKS</span></td>
+        <td width="10"></td>
+        <td width="120"><span class="data">$ENTRY_OWNER</span></td>
+        <td width="120"><span class="data">$ENTRY_GROUP</span></td>
+        <td width="90"><span class="data">$ENTRY_SIZE</span></td>
         <td width="180"><span class="data">$ENTRY_MTIME</span></td>
       </tr>
 <!--END BODY-->
