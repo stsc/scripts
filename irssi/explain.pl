@@ -46,7 +46,7 @@ sub explain
         # there are separate commands hence skip
         return if $abbrev =~ /^(?:\?|help|source)$/i;
         if (exists $explain->{$abbrev}) {
-            my $list = join ' or ', @{$explain->{$abbrev}};
+            my $list = join ' OR ', @{$explain->{$abbrev}};
             $server->command("msg $target $abbrev is also known as $list");
         }
         else {
