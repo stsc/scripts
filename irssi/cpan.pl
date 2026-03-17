@@ -9,7 +9,7 @@ use Irssi;
 use JSON qw(decode_json);
 use LWP::UserAgent;
 
-my $VERSION = '0.08';
+my $VERSION = '0.09';
 
 my %base_urls = (
     api_release => 'https://fastapi.metacpan.org/v1/release/_search',
@@ -43,25 +43,31 @@ sub prepare_json
     my %json = (
         api_release => <<"JSON",
 {
-    "query": { "term": { "distribution": "$arg" } },
-    "filter": { "term": { "status": "latest" } },
-    "sort": { "version": { "order": "desc" } },
-    "fields": [ "author", "name" ]
+    "query": {
+      "bool": {
+        "filter": [
+          { "term": { "distribution": "$arg" } },
+          { "term": { "status": "latest" } }
+        ]
+      }
+    },
+    "_source": [ "author", "name" ],
+    "size": 1
 }
 JSON
         api_file => <<"JSON",
 {
-     "query": { "filtered": {
-         "query": { "match_all": {} },
-             "filter": { "and": [
-                 { "term": { "module.name": "$arg" } },
-                 { "term": { "status": "latest" } },
-                 { "term": { "module.authorized": "true" } }
-             ]}
-         }
-     },
-     "sort": { "version": { "order": "desc" } },
-     "fields": [ "author", "release" ]
+    "query": {
+      "bool": {
+        "filter": [
+          { "term": { "module.name": "$arg" } },
+          { "term": { "status": "latest" } },
+          { "term": { "module.authorized": true } }
+        ]
+      }
+    },
+    "_source": [ "author", "release" ],
+    "size": 1
 }
 JSON
     );
@@ -114,7 +120,7 @@ sub fetch_cpan
             my $hits = $meta->{hits}{hits};
 
             if (@$hits) {
-                my $link = join '/', ($base_urls{release}, @{$hits->[0]{fields}}{qw(author name)});
+                my $link = join '/', ($base_urls{release}, @{$hits->[0]{_source}}{qw(author name)});
                 $link .= " [$arg]" unless $explicit;
                 $server->command("msg $target $link");
             }
@@ -125,7 +131,7 @@ sub fetch_cpan
                 my $hits = $meta->{hits}{hits};
 
                 if (@$hits) {
-                    my $link = join '/', ($base_urls{release}, @{$hits->[0]{fields}}{qw(author release)});
+                    my $link = join '/', ($base_urls{release}, @{$hits->[0]{_source}}{qw(author release)});
                     $link .= " [$arg]" unless $explicit;
                     $server->command("msg $target $link");
                 }
