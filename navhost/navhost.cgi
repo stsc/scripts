@@ -2,7 +2,7 @@
 #
 # navhost - List/view remote files in browser
 #
-# Copyright (c) 2009-2013, 2016, 2018-2019, 2024 Steven Schubiger
+# Copyright (c) 2009-2013, 2016, 2018-2019, 2024, 2026 Steven Schubiger
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.26';
+my $VERSION = '0.27';
 
 my (%config,
     @entry_color,
@@ -367,13 +367,13 @@ __DATA__
         <td colspan="9"><hr size="1"></td>
       </tr>
       <tr bgcolor="$HEADER_COLOR">
-        <td colspan="2"><span class="data">name ($NAME_SORT)($OPTION_ALL)</span></td>
-        <td width="145"><span class="data">type/permissions</span></td>
-        <td colspan="2"><span class="data">links</span></td>
-        <td width="120"><span class="data">owner</span></td>
-        <td width="120"><span class="data">group</span></td>
-        <td width="90"><span class="data">size</span></td>
-        <td width="180"><span class="data">modification time</span></td>
+        <td class="data" colspan="2">name ($NAME_SORT)($OPTION_ALL)</td>
+        <td class="data" width="145">type/permissions</td>
+        <td class="data" colspan="2">links</td>
+        <td class="data" width="120">owner</td>
+        <td class="data" width="120">group</td>
+        <td class="data" width="90">size</td>
+        <td class="data" width="180">modification time</td>
       </tr>
       <tr>
         <td colspan="9"><hr size="1"></td>
@@ -394,7 +394,7 @@ __DATA__
         <td colspan="9"><hr size="1"></td>
       </tr>
       <tr>
-        <td colspan="9"><span class="text">current folder: <b>$PATH</b></span></td>
+        <td class="text" colspan="9">current folder: <b>$PATH</b></td>
       </tr>
       <tr>
         <td colspan="9"><hr size="1"></td>
@@ -403,14 +403,14 @@ __DATA__
 <!--BEGIN BODY-->
       <tr bgcolor="$ENTRY_COLOR">
         <td width="18">$ENTRY_IMAGE</td>
-        <td width="300"><span class="text">$ENTRY_NAME</span></td>
-        <td width="145"><span class="data">$ENTRY_PERMS</span></td>
-        <td width="40" align="right"><span class="data">$ENTRY_LINKS</span></td>
+        <td class="text" width="300">$ENTRY_NAME</td>
+        <td class="data" width="145">$ENTRY_PERMS</td>
+        <td class="data" width="40" align="right">$ENTRY_LINKS</td>
         <td width="10"></td>
-        <td width="120"><span class="data">$ENTRY_OWNER</span></td>
-        <td width="120"><span class="data">$ENTRY_GROUP</span></td>
-        <td width="90"><span class="data">$ENTRY_SIZE</span></td>
-        <td width="180"><span class="data">$ENTRY_MTIME</span></td>
+        <td class="data" width="120">$ENTRY_OWNER</td>
+        <td class="data" width="120">$ENTRY_GROUP</td>
+        <td class="data" width="90">$ENTRY_SIZE</td>
+        <td class="data" width="180">$ENTRY_MTIME</td>
       </tr>
 <!--END BODY-->
 <!--BEGIN FOOTER-->
@@ -418,7 +418,7 @@ __DATA__
         <td colspan="9"><hr size="1"></td>
       </tr>
       <tr>
-        <td colspan="9"><span class="text">Last generated: $LAST_GENERATED</span></td>
+        <td class="text" colspan="9">Last generated: $LAST_GENERATED</td>
       </tr>
       <tr>
         <td colspan="9"><hr size="1"></td>
@@ -441,10 +441,10 @@ __DATA__
   <body>
     <table border="0" align="left">
       <tr>
-        <td><span class="text"><b>$STATUS_MSG</b></span></td>
+        <td class="text"><b>$STATUS_MSG</b></td>
       </tr>
       <tr>
-        <td><span class="text"><a href="javascript:history.back()">return</a></span></td>
+        <td class="text"><a href="javascript:history.back()">return</a></td>
       </tr>
     </table>
   </body>
