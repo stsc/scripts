@@ -24,13 +24,14 @@ use constant false => 0;
 
 use CGI ();
 #use CGI::Carp 'fatalsToBrowser';
+use Cwd qw(abs_path);
 use Fcntl ':mode';
 use File::Spec::Functions ':ALL';
 use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.27';
+my $VERSION = '0.28';
 
 my (%config,
     @entry_color,
@@ -117,10 +118,17 @@ sub read_dir_listing
     my $mode  = $params{all} ? 'default' : 'all';
     my $order = $params{asc} ? 'desc'    : 'asc';
 
+    my $target = '';
+    if (-l $params{path}) {
+        local $_ = abs_path($params{path});
+        $target = " -> $_";
+    };
+
     my $html_header = $html{header};
 
     my %subst = (
         path         => qq($params{path}),
+        target       => qq($target),
         option_all   => qq(<a href="$script_url_mode">toggle <b>$mode</b></a>),
         name_sort    => qq(<a href="$script_url_sort">sort <b>$order</b></a>),
         folder_image => qq(<img src="$config{icons}->{folder}" alt="folder">),
@@ -226,15 +234,19 @@ sub subst_entry_name
 {
     my ($entry, $html) = @_;
 
+    my $symlink = -l catfile($params{path}, $entry) ? '->' : '';
+
+    my $entry_full = $entry . ${\do { length $symlink ? " $symlink" : () }};
+
     if (!-d catfile($params{path}, $entry) and -p _ || -S _ || -b _ || -c _ || -B _) {
-        html_populate($html, 'entry_name', $entry);
+        html_populate($html, 'entry_name', $entry_full);
     }
     else {
         my $path = catfile($params{path}, $entry);
 
         my $script_url = get_script_url(path => $path);
 
-        html_populate($html, 'entry_name', qq(<a href="$script_url">$entry</a>));
+        html_populate($html, 'entry_name', qq(<a href="$script_url">$entry_full</a>));
     }
 }
 
@@ -394,7 +406,7 @@ __DATA__
         <td colspan="9"><hr size="1"></td>
       </tr>
       <tr>
-        <td class="text" colspan="9">current folder: <b>$PATH</b></td>
+        <td class="text" colspan="9">current folder: <b>$PATH</b>$TARGET</td>
       </tr>
       <tr>
         <td colspan="9"><hr size="1"></td>
