@@ -31,7 +31,7 @@ use IO::File ();
 use POSIX qw(ceil strftime);
 use URI::Escape qw(uri_escape);
 
-my $VERSION = '0.28';
+my $VERSION = '0.29';
 
 my (%config,
     @entry_color,
@@ -242,7 +242,12 @@ sub subst_entry_name
         html_populate($html, 'entry_name', $entry_full);
     }
     else {
-        my $path = catfile($params{path}, $entry);
+        my $abs_path       = abs_path(        $params{path}         );
+        my $abs_path_entry = abs_path(catfile($params{path}, $entry));
+
+        my $path = $abs_path eq $abs_path_entry
+          ? $params{path}
+          : catfile($params{path}, $entry);
 
         my $script_url = get_script_url(path => $path);
 
