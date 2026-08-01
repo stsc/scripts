@@ -1,6 +1,6 @@
-navhost
-=======
-navhost is a CGI script written in Perl.  It lists remote files in
+web-ls
+======
+web-ls is a CGI script written in Perl.  It lists remote files in
 browser window similar how `ls` does for local ones and allows to
 view readable files.
 

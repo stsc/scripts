@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# navhost - List/view remote files in browser
+# web-ls - List/view remote files in browser
 #
 # Copyright (c) 2009-2013, 2016, 2018-2019, 2024, 2026 Steven Schubiger
 #
@@ -366,12 +366,12 @@ sub print_status
 
 __DATA__
 <!--BEGIN HEADER-->
-<!-- navhost v$VERSION - https://github.com/stsc/scripts/tree/master/navhost -->
+<!-- web-ls v$VERSION - https://github.com/stsc/scripts/tree/master/web-ls -->
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
        "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
   <head>
-    <title>navhost: $PATH</title>
+    <title>web-ls: $PATH</title>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <style type="text/css">
       .data { font-family: Courier, Monospace; font-size: small; padding: 2.5px }
@@ -449,7 +449,7 @@ __DATA__
        "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
   <head>
-    <title>navhost: $PATH</title>
+    <title>web-ls: $PATH</title>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <style type="text/css">
       .text { font-family: Arial, Helvetica, sans-serif; font-size: small }
