@@ -1,8 +1,8 @@
 web-ls
 ======
-web-ls is a CGI script written in Perl.  It lists remote files in
-browser window similar how `ls` does for local ones and allows to
-view readable files.
+web-ls is a CGI script written in Perl.  It lists remote files
+in browser window similar how `ls(1)` does for local ones
+(mostly: `ls -lh`) and allows to view readable files.
 
 The script itself contains the HTML templates which are attached to
 the data section of the script.  Usually, changes do not need to be
